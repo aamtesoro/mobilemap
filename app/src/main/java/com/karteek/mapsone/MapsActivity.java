@@ -2,61 +2,49 @@ package com.karteek.mapsone;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.PopupMenu;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends Activity implements OnMapReadyCallback {
-    MapFragment mapFragment;
-    GoogleMap map;
-    Button button;
-    PopupMenu popup;
+
+    static final LatLng NEWARK = new LatLng(40.735188, -74.172414);
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        button = (Button)findViewById(R.id.button);
-        mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
+        MapFragment mapFragment = (MapFragment)getFragmentManager().
+                findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        map.setMapType(GoogleMap.MAP_TYPE_NONE);
-        button.setOnClickListener(new View.OnClickListener() {
+    public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(NEWARK).
+                draggable(true));
+        map.setOnMarkerDragListener(new GoogleMap.
+                OnMarkerDragListener() {
             @Override
-            public void onClick(View v) {
-                showPopup();
+            public void onMarkerDragStart(Marker marker) {
+                Toast.makeText(getApplicationContext(),"Drag started",Toast.LENGTH_SHORT).show();
             }
-        }); }
-    public void showPopup(){
-        if (popup == null) {
-            popup = new PopupMenu(MapsActivity.this, button);
-            popup.getMenuInflater().inflate(R.menu.popup,
-                    popup.getMenu());
-        }
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-             @Override
-             public boolean onMenuItemClick(MenuItem item) {
-                 if (item.getItemId() == R.id.action_normal) {
-                     map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                     button.setText("Normal");
-                 }else if (item.getItemId() == R.id.action_satellite) {
-                     map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                     button.setText("Satellite");
-                 }else if (item.getItemId() == R.id.action_hydrid) {
-                     map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                     button.setText("Hybrid");
-                 }else if (item.getItemId() == R.id.action_terrain) {
-                     map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                     button.setText("Terrain");
-                 }
-                 return true;
-             }
-         });
-        popup.show();
-    } }
+            public void onMarkerDrag(Marker marker) {
+                Log.d("Drag","Dragging");
+            }
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                Log.d("Drag","Drag ended");
+                LatLng latLng = marker.getPosition();
+                Double latitude = latLng.latitude;
+                Double longitude = latLng.longitude;
+                Toast.makeText(getApplicationContext(),"Latitude : "+latitude+"\nLongitude : "+longitude,Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
