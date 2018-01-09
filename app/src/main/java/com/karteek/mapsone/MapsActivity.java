@@ -1,10 +1,11 @@
 package com.karteek.mapsone;
 
+
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
-
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends Activity implements OnMapReadyCallback {
 
+    static final LatLng LONDON= new LatLng(51.519029, -0.130094);
     static final LatLng NEWARK = new LatLng(40.735188, -74.172414);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,27 +25,36 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
                 findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
     @Override
     public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(LONDON).
+                title("London").snippet("Hi chief, Welcome to London !"));
         map.addMarker(new MarkerOptions().position(NEWARK).
-                draggable(true));
-        map.setOnMarkerDragListener(new GoogleMap.
-                OnMarkerDragListener() {
+                title("Newark").snippet("Hi chief, Welcome to Newark !"));
+        map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
-            public void onMarkerDragStart(Marker marker) {
-                Toast.makeText(getApplicationContext(),"Drag started",Toast.LENGTH_SHORT).show();
-            }
-            public void onMarkerDrag(Marker marker) {
-                Log.d("Drag","Dragging");
+            public View getInfoWindow(Marker marker) {
+                return null;
             }
             @Override
-            public void onMarkerDragEnd(Marker marker) {
-                Log.d("Drag","Drag ended");
+            public View getInfoContents(Marker marker) {
+                View v = getLayoutInflater().inflate(R.layout.info_window, null);
                 LatLng latLng = marker.getPosition();
-                Double latitude = latLng.latitude;
-                Double longitude = latLng.longitude;
-                Toast.makeText(getApplicationContext(),"Latitude : "+latitude+"\nLongitude : "+longitude,Toast.LENGTH_LONG).show();
+                ImageView icon = (ImageView)v.findViewById(R.id.icon);
+                TextView title = (TextView)v.findViewById(R.id.title);
+                TextView snippet = (TextView)v.findViewById(R.id.snippet);
+                TextView lat = (TextView) v.findViewById(R.id.lat);
+                TextView lng = (TextView) v.findViewById(R.id.lng);
+                title.setText(marker.getTitle());
+                snippet.setText(marker.getSnippet());
+                if(marker.getTitle().equals("London")){
+                    icon.setImageResource(R.drawable.ukmap);
+                }else if(marker.getTitle().equals("Newark")){
+                    icon.setImageResource(R.drawable.usamap);
+                }
+                lat.setText("Latitude: " + latLng.latitude);
+                lng.setText("Longitude: "+ latLng.longitude);
+                return v;
             }
         });
     }
