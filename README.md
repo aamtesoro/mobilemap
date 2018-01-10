@@ -14,3 +14,9 @@ Today features added are
 1. Show multiple different may types (Google maps)
 2. Added marker on the map
 3. Added content to the marker. When maker is clicked a popup will open and will show content there.
+
+Day3 (2018/01/10):
+Today features added are
+1. Able to add marker on the map. click any where on the map, a popup will appear to create marker.
+2. Tried different camera features of Google map 
+3. Add buttons on the map to move map up, down, right and left.
